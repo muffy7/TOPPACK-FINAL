@@ -12,23 +12,20 @@ import java.util.*;
 
 public class Finalize {
 	
-	
 static OkHttpClient client = new OkHttpClient();
-
-//This run method is for the OkHttp Part
-public static String run(String url) throws IOException {
-	Request request = new Request.Builder()
+    //This run method is for the OkHttp Part
+    public static String run(String url) throws IOException {
+	    Request request = new Request.Builder()
 	        .url(url)
 	        .build();
 
 	    try (Response response = client.newCall(request).execute()) {
 	      return response.body().string();
 	    }
-}
+     }
 
-//Now from here I have defined all the three methods in same file. First method is search
+    //Now from here I have defined all the three methods in same file. First method is search
 public static void search(String keyWord) throws IOException {
-	
 	    JSONParser parser = new JSONParser();
 	    BufferedWriter Repository_Id = new BufferedWriter(new FileWriter("D:/Repositories_Id.txt"));
     	//I am limiting my search for 5 pages ..... We can change it from here if we need to. 
@@ -68,38 +65,38 @@ public static void search(String keyWord) throws IOException {
 	        	   System.out.println();
 		       }
 	           
-     }
+        }
     	try {
 			Repository_Id.close();
-		   } catch (IOException e) {
+		    } catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		   }
 }
 
+
+    
 //Now this is our second method Import which takes repository Id as an input and then uses it to print the packages if package.json file is present 
 public static void Import (String id) throws IOException
 {
        
        String response = null;
        BufferedWriter pac = new BufferedWriter(new FileWriter("D:/packages.txt"));
-	try {
-		response = run("https://api.github.com/repositories/"+id);
-		if(response.contains("API rate limit exceeded")) {System.out.println("Network- Error: API rate limit exceeded");System.exit(0);}
-	} catch (IOException e3) {
+	   try {
+		  response = run("https://api.github.com/repositories/"+id);
+		  if(response.contains("API rate limit exceeded")) {System.out.println("Network- Error: API rate limit exceeded");System.exit(0);}
+	   } catch (IOException e3) {
 		// TODO Auto-generated catch block
-		e3.printStackTrace();
-	}
+		 e3.printStackTrace();
+	   }
        JSONParser parser = new JSONParser();
        Object obj = null;
-	try {
-		obj = parser.parse(response);
-	} catch (ParseException e3) {
-		e3.printStackTrace();
-	}
-       JSONObject jobj=(JSONObject)obj;
-        
-        
+	   try {
+	     	obj = parser.parse(response);
+	    } catch (ParseException e3) {
+	  	e3.printStackTrace();
+	    }
+        JSONObject jobj=(JSONObject)obj;
         int j;	
         String name=(String)(jobj).get("name");
         System.out.println("Name: "+name);	
@@ -110,8 +107,6 @@ public static void Import (String id) throws IOException
         }
         user_name=user_name.substring(0,j);
         System.out.println("Owner: "+user_name);
-        
-        
         String response1 = null;
 		try {
 			//This will print the files and directories present inside this directory under the name of User_name
@@ -122,64 +117,74 @@ public static void Import (String id) throws IOException
 			e2.printStackTrace(); 
 		}
 
-   Object obj2 = null;
-   try {
-	obj2 = parser.parse(response1);
-   } catch (ParseException e1) {
-	e1.printStackTrace();
-    }
-   JSONArray arr =(JSONArray)obj2;
-   Map<String, Integer> packages = new HashMap<String, Integer>();
-   for(int i=0;i<arr.size();i++){
-	            JSONObject jobj2=(JSONObject)arr.get(i);
-	            if(((String)jobj2.get("name")).equals("package.json")){
-		        String DownLoad_Url = null;
-				try {
-					DownLoad_Url = run((String)jobj2.get("download_url"));//This will help us see the contents of package.json 
-					if(DownLoad_Url.contains("API rate limit exceeded")) {System.out.println("Network- Error: API rate limit exceeded");System.exit(0);}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		        JSONParser parse = new JSONParser();
-                JSONObject job = new JSONObject();
-                try {
-					job = (JSONObject)parse.parse(DownLoad_Url);
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-                JSONObject dev = (JSONObject)job.get("dependencies");
-                JSONObject devDep = (JSONObject)job.get("devDependencies");
-                for (Object key : dev.keySet()) {
-                  String keyStr = (String)key;
-                  System.out.println(keyStr+", ");
-                  pac.write(keyStr);
-                  pac.newLine();
-                 if(packages.containsKey(keyStr)){
-                     packages.replace(keyStr, packages.get(keyStr)+1);
-                 }
-                 else{
-                     packages.put(keyStr,1);
-                 }
-                 }
-                for (Object key : devDep.keySet()) {
-                  String keyStr = (String)key;
-                  System.out.print(keyStr+", ");
-                  pac.write(keyStr);
-                  pac.newLine();
-                 if(packages.containsKey(keyStr)){
-                    packages.replace(keyStr, packages.get(keyStr)+1);
-                      }
-                else{
-                    packages.put(keyStr,1);
-                    }
-                 }
-                System.out.println("");
-                break;
-                }   
+        Object obj2 = null;
+        try {
+	        obj2 = parser.parse(response1);
+        } catch (ParseException e1) {
+	        e1.printStackTrace();
+        }
+        JSONArray arr =(JSONArray)obj2;
+        Map<String, Integer> packages = new HashMap<String, Integer>();
+        
+        for(int i=0;i<arr.size();i++){
+        	
+        	
+        	JSONObject jobj2=(JSONObject)arr.get(i);
+	        if(((String)jobj2.get("name")).equals("package.json")){
+	        	
+	        	String DownLoad_Url = null;
+			    try {
+				    DownLoad_Url = run((String)jobj2.get("download_url"));//This will help us see the contents of package.json 
+				    if(DownLoad_Url.contains("API rate limit exceeded")) {System.out.println("Network- Error: API rate limit exceeded");System.exit(0);}
+			    } catch (IOException e) {
+				    e.printStackTrace();
+			    }
+			    JSONParser parse = new JSONParser();
+			    JSONObject job = new JSONObject();
+			    try {
+			    	   job = (JSONObject)parse.parse(DownLoad_Url);
+			    } catch (ParseException e) {
+			        e.printStackTrace();
+			    }
+			    JSONObject dev = (JSONObject)job.get("dependencies");
+			    JSONObject devDep = (JSONObject)job.get("devDependencies");
+			    
+			    for (Object key : dev.keySet()) {
+			    	
+			        String keyStr = (String)key;
+			        System.out.println(keyStr+", ");
+			        pac.write(keyStr);
+			        pac.newLine();
+			        if(packages.containsKey(keyStr)){
+			            packages.replace(keyStr, packages.get(keyStr)+1);
+			            }
+			        else{
+			            packages.put(keyStr,1);
+			            }
+			        
+			        }
+			    for (Object key : devDep.keySet()) {
+			    	
+			        String keyStr = (String)key;
+			        System.out.print(keyStr+", ");
+			        pac.write(keyStr);
+			        pac.newLine();
+			        if(packages.containsKey(keyStr)){
+			            packages.replace(keyStr, packages.get(keyStr)+1);
+			            }
+			        else{
+			            packages.put(keyStr,1);
+			            
+			            }
+			        }
+			       System.out.println("");
+			       break;
+			 }   
                  
-           }
-   pac.close();
+	      }
+        pac.close();
 }
+
 //This is my third method which will help me print the top ten packages used in the given directories  
 public static void toppacks() 
 {
@@ -202,17 +207,16 @@ public static void toppacks()
 	//br1 = new BufferedReader(new FileReader("D:/packages.txt"));
 	Map<String, Integer> hm = new HashMap<String, Integer>();
 	String repo_Id="";
-	
-		try {
-			repo_Id = br.readLine();
-			read_counter_repository++;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	try {
+		repo_Id = br.readLine();
+		read_counter_repository++;
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
 	
 	while(repo_Id!=null)
 	{
+		
 		System.out.println("Repositories_Id  :-"+repo_Id);
 	    try {
 			br1.seek(0);//For each repository_Id package.txt is updated so we need to go to the starting of the file and for this I will need this
@@ -242,6 +246,7 @@ public static void toppacks()
 					e.printStackTrace();
 				}
 		}
+		
 		if(read_counter_repository<5) { //This will limit to search for the packages in the first 5 Repository_Id's present in the Repositories.txt. We can change it here if we want but we need to mind the API rate limit
 		      try {
 				repo_Id = br.readLine();
@@ -252,13 +257,12 @@ public static void toppacks()
 		}
 		
 	}
-	
-		try {
-			br.close();
-			br1.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	try {
+		br.close();
+		br1.close();
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
 	System.out.println("\n \n HURRAH WE GOT THIS THING AND NOW ---- \n \n");
 	//This will print the top 10 used packages :)
 	hm.entrySet().stream()
@@ -276,7 +280,6 @@ public static void main(String args[]){
 		}
 		toppacks();
 	    sc.close();
-		
 	}
 
 }
